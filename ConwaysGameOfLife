@@ -1,0 +1,54 @@
+import random
+import time
+import os
+
+WIDTH = 20
+HEIGHT = 10
+
+# Create a new random grid
+def create_grid():
+    return [[random.randint(0, 1) for _ in range(WIDTH)] for _ in range(HEIGHT)]
+
+# Display the grid
+def display_grid(grid):
+    os.system('cls' if os.name == 'nt' else 'clear')  # Clear screen
+    for row in grid:
+        print(''.join(['■' if cell else ' ' for cell in row]))
+    print("\nPress Ctrl+C to stop.")
+
+# Get number of alive neighbors
+def count_neighbors(grid, x, y):
+    directions = [(-1, -1), (-1, 0), (-1, 1),
+                  ( 0, -1),         ( 0, 1),
+                  ( 1, -1), ( 1, 0), ( 1, 1)]
+    count = 0
+    for dx, dy in directions:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < HEIGHT and 0 <= ny < WIDTH:
+            count += grid[nx][ny]
+    return count
+
+# Apply rules of the Game of Life
+def update_grid(grid):
+    new_grid = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
+    for i in range(HEIGHT):
+        for j in range(WIDTH):
+            neighbors = count_neighbors(grid, i, j)
+            if grid[i][j] == 1:
+                new_grid[i][j] = 1 if neighbors in [2, 3] else 0
+            else:
+                new_grid[i][j] = 1 if neighbors == 3 else 0
+    return new_grid
+
+# Main loop
+def run_game():
+    grid = create_grid()
+    try:
+        while True:
+            display_grid(grid)
+            grid = update_grid(grid)
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        print("\nGame exited.")
+
+run_game()
